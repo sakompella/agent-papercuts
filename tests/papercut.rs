@@ -49,7 +49,14 @@ fn run_papercut(arguments: &[&str]) -> Output {
 fn appends_a_normalized_entry_to_the_requested_log() {
     let log = TestLog::new();
     let log_path = log.path.to_string_lossy();
-    let output = run_papercut(&["--file", &log_path, "--model", "gpt-5", "broken", "  link"]);
+    let output = run_papercut(&[
+        "--file",
+        &log_path,
+        "--model",
+        "gpt-5.6-terra",
+        "broken",
+        "  link",
+    ]);
 
     assert!(output.status.success());
     let contents = match fs::read_to_string(&log.path) {
@@ -57,13 +64,13 @@ fn appends_a_normalized_entry_to_the_requested_log() {
         Err(error) => panic!("papercut log should be readable: {error}"),
     };
     assert!(contents.starts_with("# Papercuts\n\n"));
-    assert!(contents.contains(" — gpt-5 — "));
+    assert!(contents.contains(" — gpt-5.6-terra — "));
     assert!(contents.ends_with("broken link\n"));
 }
 
 #[test]
 fn rejects_a_missing_message() {
-    let output = run_papercut(&["--model", "gpt-5"]);
+    let output = run_papercut(&["--model", "claude-sonnet-5"]);
 
     assert!(!output.status.success());
     assert!(String::from_utf8_lossy(&output.stderr).contains("required"));

@@ -18,14 +18,14 @@ cargo install --path .
 For development, run it without installing:
 
 ```sh
-cargo run -- -m gpt-5-codex "The command's error did not explain the required setup."
+cargo run -- -m gpt-5.6-terra "The command's error did not explain the required setup."
 ```
 
 ## Use
 
 ```sh
-papercut -m gpt-5-codex "The local database reset command requires Docker, but the setup guide does not mention it."
-papercut --file docs/PAPERCUTS.md "The API reference link redirects to a removed page."
+papercut -m gpt-5.6-terra "The local database reset command requires Docker, but the setup guide does not mention it."
+papercut -m claude-sonnet-5 --file docs/PAPERCUTS.md "The API reference link redirects to a removed page."
 ```
 
 The default author is `$USER` (or `unknown`) and the default log is
@@ -45,7 +45,7 @@ are UTC RFC 3339 values.
 
 Small, non-blocking workflow friction recorded by agents.
 
-## 2026-07-10T06:54:19.910458Z — gpt-5-codex — aditya
+## 2026-07-10T06:54:19.910458Z — gpt-5.6-terra — aditya
 
 The documentation omits the required environment variable.
 ```
