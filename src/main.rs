@@ -1,41 +1,37 @@
-use std::{
-    env,
-    fs::{self, OpenOptions},
-    io::Write,
-    path::PathBuf,
-};
+use std::path::PathBuf;
 
 use clap::Parser;
-use color_eyre::eyre::{Result, WrapErr, bail};
+use color_eyre::eyre::{Result, bail};
+#[cfg(test)]
 use jiff::Timestamp;
 
+mod helper;
+
 const DEFAULT_LOG_FILE: &str = "PAPERCUTS.md";
-const INITIAL_LOG_CONTENT: &str =
-    "# Papercuts\n\nSmall, non-blocking workflow friction recorded by agents.\n";
 
 #[derive(Debug, Parser)]
 #[command(
     name = "papercut",
     about = "Record a small agent-workflow friction note in PAPERCUTS.md"
 )]
-struct Command {
+pub(crate) struct Command {
     /// Model that encountered the friction.
     #[arg(short, long)]
-    model: Option<String>,
+    pub(crate) model: Option<String>,
 
     /// Markdown log to append to.
     #[arg(long, default_value = DEFAULT_LOG_FILE)]
-    file: PathBuf,
+    pub(crate) file: PathBuf,
 
     /// What happened and what would have prevented it.
     #[arg(required = true, num_args = 1..)]
-    message: Vec<String>,
+    pub(crate) message: Vec<String>,
 }
 
 impl Command {
-    fn message(&self) -> Result<String> {
+    pub(crate) fn message(&self) -> Result<String> {
         let message = self.message.join(" ");
-        let message = normalize_message(&message);
+        let message = helper::normalize_message(&message);
         if message.is_empty() {
             bail!("A papercut message cannot be empty.");
         }
@@ -44,58 +40,10 @@ impl Command {
     }
 }
 
-fn normalize_message(message: &str) -> String {
-    message.split_whitespace().collect::<Vec<_>>().join(" ")
-}
-
-fn format_entry(command: &Command, author: &str, timestamp: &Timestamp) -> Result<String> {
-    let model = command.model.as_deref().unwrap_or("unspecified-model");
-    let message = command.message()?;
-    Ok(format!(
-        "\n## {timestamp} — {model} — {author}\n\n{message}\n"
-    ))
-}
-
-fn append_entry(command: &Command) -> Result<()> {
-    let author = env::var("USER").unwrap_or_else(|_| "unknown".to_owned());
-    let needs_heading = !command.file.exists();
-    if let Some(parent) = command
-        .file
-        .parent()
-        .filter(|parent| !parent.as_os_str().is_empty())
-    {
-        fs::create_dir_all(parent)
-            .wrap_err_with(|| format!("Could not create log directory {}", parent.display()))?;
-    }
-
-    let mut log = OpenOptions::new()
-        .create(true)
-        .append(true)
-        .open(&command.file)
-        .wrap_err_with(|| format!("Could not open papercut log {}", command.file.display()))?;
-    if needs_heading {
-        log.write_all(INITIAL_LOG_CONTENT.as_bytes())
-            .wrap_err_with(|| {
-                format!(
-                    "Could not initialize papercut log {}",
-                    command.file.display()
-                )
-            })?;
-    }
-    let entry = format_entry(command, &author, &Timestamp::now())?;
-    log.write_all(entry.as_bytes()).wrap_err_with(|| {
-        format!(
-            "Could not append to papercut log {}",
-            command.file.display()
-        )
-    })?;
-    Ok(())
-}
-
 fn main() -> Result<()> {
     color_eyre::install()?;
     let command = Command::parse();
-    append_entry(&command)?;
+    helper::append_entry(&command)?;
     println!("Recorded papercut in {}.", command.file.display());
     Ok(())
 }
@@ -159,7 +107,7 @@ mod tests {
             Err(error) => panic!("timestamp should construct: {error}"),
         };
 
-        let entry = match format_entry(&command, "ada", &timestamp) {
+        let entry = match helper::format_entry(&command, "ada", &timestamp) {
             Ok(entry) => entry,
             Err(error) => panic!("entry should format: {error}"),
         };
