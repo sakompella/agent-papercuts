@@ -1,0 +1,27 @@
+[package]
+name = "agent-papercut"
+version = "0.1.0"
+edition = "2024"
+description = "A tiny CLI for recording agent workflow friction"
+license = "MIT OR Apache-2.0"
+
+[dependencies]
+clap = { version = "4.6.1", features = ["derive"] }
+color-eyre = "0.6.5"
+jiff = "0.2.31"
+
+[[bin]]
+name = "papercut"
+path = "src/main.rs"
+
+[lints.clippy]
+all = "warn"
+nursery = "warn"
+pedantic = "warn"
+unwrap_used = "warn"
+expect_used = "warn"
+integer_division = "warn"
+arithmetic_side_effects = "warn"
+indexing_slicing = "warn"
+wildcard_enum_match_arm = "warn"
+unneeded_field_pattern = "warn"
