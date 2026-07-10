@@ -5,6 +5,9 @@ use std::{
     sync::atomic::{AtomicU64, Ordering},
 };
 
+use agent_papercut::normalize_message;
+use hegel::generators;
+
 static NEXT_TEST_ID: AtomicU64 = AtomicU64::new(0);
 
 struct TestLog {
@@ -75,4 +78,12 @@ fn rejects_an_all_whitespace_message() {
     assert!(!output.status.success());
     assert!(String::from_utf8_lossy(&output.stderr).contains("papercut message cannot be empty"));
     assert!(!log.path.exists());
+}
+
+#[hegel::test]
+fn normalizing_text_is_idempotent(tc: hegel::TestCase) {
+    let text: String = tc.draw(generators::text());
+    let normalized = normalize_message(&text);
+
+    assert_eq!(normalize_message(&normalized), normalized);
 }
