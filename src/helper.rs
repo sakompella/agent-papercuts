@@ -26,6 +26,7 @@ pub fn format_entry(command: &Command, author: &str, timestamp: &Timestamp) -> R
 
 pub fn append_entry(command: &Command) -> Result<()> {
     let author = env::var("USER").unwrap_or_else(|_| "unknown".to_owned());
+    let entry = format_entry(command, &author, &Timestamp::now())?;
     let needs_heading = !command.file.exists();
     if let Some(parent) = command
         .file
@@ -50,7 +51,6 @@ pub fn append_entry(command: &Command) -> Result<()> {
                 )
             })?;
     }
-    let entry = format_entry(command, &author, &Timestamp::now())?;
     log.write_all(entry.as_bytes()).wrap_err_with(|| {
         format!(
             "Could not append to papercut log {}",
