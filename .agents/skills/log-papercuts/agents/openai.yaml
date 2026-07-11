@@ -1,0 +1,4 @@
+interface:
+  display_name: "Log Papercuts"
+  short_description: "Record useful workflow friction locally"
+  default_prompt: "Use $log-papercuts to record a workflow friction note."
