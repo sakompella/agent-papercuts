@@ -1,0 +1,27 @@
+name: Clippy
+
+on:
+  pull_request:
+  push:
+
+permissions:
+  contents: read
+
+jobs:
+  clippy:
+    name: Clippy (aarch64-darwin)
+    runs-on: macos-26
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Install Lix
+        uses: samueldr/lix-gha-installer-action@8dc19fbd6451fa106a68ecb2dafeeeb90dff3a29
+
+      - name: Configure Cachix
+        uses: cachix/cachix-action@v17
+        with:
+          name: nix-community
+
+      - name: Run Clippy
+        run: nix develop --command cargo clippy --all-targets --all-features
