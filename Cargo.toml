@@ -8,7 +8,7 @@ license = "MIT OR Apache-2.0"
 [dependencies]
 clap = { version = "4.6.1", features = ["derive"] }
 color-eyre = "0.6.5"
-jiff = "0.2.31"
+jiff = { version = "0.2.31", default-features = false, features = ["std"] }
 
 [dev-dependencies]
 hegeltest = "0.26.0"
