@@ -5,8 +5,16 @@ use std::{
     sync::atomic::{AtomicU64, Ordering},
 };
 
-use agent_papercut::normalize_message;
 use hegel::generators;
+
+#[expect(
+    dead_code,
+    reason = "this test imports main.rs only to property-test normalize_message"
+)]
+#[path = "../src/main.rs"]
+mod papercut;
+
+use papercut::normalize_message;
 
 static NEXT_TEST_ID: AtomicU64 = AtomicU64::new(0);
 
