@@ -24,14 +24,14 @@ cargo run -- -m gpt-5.6-terra "The command's error did not explain the required 
 ## Use
 
 ```sh
-papercut -m gpt-5.6-terra "The local database reset command requires Docker, but the setup guide does not mention it."
-papercut -m claude-sonnet-5 --file docs/PAPERCUTS.md "The API reference link redirects to a removed page."
+papercut --author aditya -m gpt-5.6-terra "The local database reset command requires Docker, but the setup guide does not mention it."
+papercut --author codex -m claude-sonnet-5 --file docs/PAPERCUTS.md "The API reference link redirects to a removed page."
 ```
 
-The default author is `$USER` (or `unknown`) and the default log is
-`PAPERCUTS.md` in the current directory. `--file` chooses a different log; its
-parent directories are created when needed. The message may contain multiple
-words and whitespace is normalized to one space.
+The default author is `unknown`; use `--author` to record a person or agent.
+The default log is `PAPERCUTS.md` in the current directory. `--file` chooses a
+different log; its parent directories are created when needed. The message may
+contain multiple words and whitespace is normalized to one space.
 
 Use `papercut --help` for the complete, generated interface.
 
@@ -59,10 +59,10 @@ Add something like this to your `AGENTS.md`:
 
 > When you encounter a small, non-blocking source of friction—such as a dead-end
 > tool call, misleading error, missing setup step, stale cache, or broken
-> link—record it immediately with `papercut -m <model> "<what happened and what
-> would have prevented it>"`. Keep it to one or two sentences. Do not log normal
-> task progress, bugs that belong in the issue tracker, or secrets. Continue the
-> task unless the problem blocks it.
+> link—record it immediately with `papercut --author <author> -m <model> "<what
+> happened and what would have prevented it>"`. Keep it to one or two sentences.
+> Do not log normal task progress, bugs that belong in the issue tracker, or
+> secrets. Continue the task unless the problem blocks it.
 
 Start by reviewing `PAPERCUTS.md` during maintenance work. Keep automatic
 session mining as a separate, explicitly triggered command; unsolicited model

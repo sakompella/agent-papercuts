@@ -1,5 +1,4 @@
 use std::{
-    env,
     fs::{self, OpenOptions},
     io::Write,
     path::PathBuf,
@@ -33,6 +32,10 @@ struct Command {
     #[arg(short, long)]
     model: Option<String>,
 
+    /// Person or agent that encountered the friction.
+    #[arg(long)]
+    author: Option<String>,
+
     /// Markdown log to append to.
     #[arg(long, default_value = DEFAULT_LOG_FILE)]
     file: PathBuf,
@@ -54,8 +57,8 @@ impl Command {
 }
 
 fn append_entry(command: &Command) -> Result<()> {
-    let author = env::var("USER").unwrap_or_else(|_| UNKNOWN_AUTHOR.to_owned());
-    let entry = format_entry(command, &author, &Timestamp::now())?;
+    let author = command.author.as_deref().unwrap_or(UNKNOWN_AUTHOR);
+    let entry = format_entry(command, author, &Timestamp::now())?;
     if let Some(parent) = command
         .file
         .parent()
