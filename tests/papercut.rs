@@ -27,7 +27,7 @@ impl TestLog {
     fn new() -> Self {
         let id = NEXT_TEST_ID.fetch_add(1, Ordering::Relaxed);
         let directory =
-            std::env::temp_dir().join(format!("agent-papercut-test-{}-{id}", std::process::id()));
+            std::env::temp_dir().join(format!("agent-papercuts-test-{}-{id}", std::process::id()));
         if let Err(error) = fs::create_dir_all(&directory) {
             panic!("test directory should be created: {error}");
         }
@@ -82,8 +82,8 @@ fn help_shows_project_information() {
 
     assert!(output.status.success());
     let help = String::from_utf8_lossy(&output.stdout);
-    assert!(help.contains("vibed agent tool for simple things"));
-    assert!(help.contains("Project: https://github.com/sakompella/agent-papercut"));
+    assert!(help.contains("vibed agent tool for logging simple issues"));
+    assert!(help.contains("Project: https://github.com/sakompella/agent-papercuts"));
 }
 
 #[test]

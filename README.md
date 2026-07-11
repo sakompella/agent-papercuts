@@ -1,4 +1,4 @@
-# agent-papercut
+# agent-papercuts
 
 A small Rust CLI for recording the pieces of friction agents encounter while
 working: misleading errors, missing tools, broken links, and undocumented setup

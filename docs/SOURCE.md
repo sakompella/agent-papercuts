@@ -1,6 +1,6 @@
 # Source
 
-`agent-papercut` was inspired by Steve Ruiz's papercuts thread on X.
+`agent-papercuts` was inspired by Steve Ruiz's papercuts thread on X.
 
 ## Original posts
 
