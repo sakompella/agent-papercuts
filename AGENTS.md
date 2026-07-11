@@ -12,8 +12,8 @@ model calls, or automatic session mining.
   for text normalization. Keep behavior tests outside `src/`.
 - `README.md` documents installation, CLI use, output, and the reusable agent
   instruction. Update it for user-visible CLI or output changes.
-- `SOURCE.md` records the source thread, screenshots, and transcript. Preserve
-  its source links and captures when changing the attribution material.
+- `docs/SOURCE.md` records the source thread, screenshots, and transcript.
+  Preserve its source links and captures when changing the attribution material.
 
 ## Behavior to preserve
 

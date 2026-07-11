@@ -1,8 +1,8 @@
 # Source
 
-`agent-papercut` is inspired by Steve Ruiz's papercuts thread on X.
+`agent-papercut` was inspired by Steve Ruiz's papercuts thread on X.
 
-## Source posts
+## Original posts
 
 1. [Introducing the papercuts CLI](https://x.com/steveruizok/status/2075303919664734295)
 2. [Using a model to fix the log](https://x.com/steveruizok/status/2075304096328798401)
@@ -10,17 +10,16 @@
 
 ## Captures
 
-- [Complete recovered thread capture](docs/source/steve-ruiz-papercuts-thread.png)
-- [Post 1 capture](docs/source/steve-ruiz-papercuts-post-1.png)
-- [Post 2 capture](docs/source/steve-ruiz-papercuts-post-2.png)
-- [Post 3 capture](docs/source/steve-ruiz-papercuts-post-3.png)
+- [Complete thread capture](source/steve-ruiz-papercuts-thread.png)
+- [Post 1](source/steve-ruiz-papercuts-post-1.png)
+- [Post 2](source/steve-ruiz-papercuts-post-2.png)
+- [Post 3](source/steve-ruiz-papercuts-post-3.png)
 
-The complete capture is a single rendering of the three linked posts and the
-text in the third post's attached image. It is included because X's guest view
-did not show the reply chain together. The individual captures are direct
-browser captures of the linked posts.
+The complete capture combines the three posts and the image attached to post 3.
+It is included because X's guest view did not show the reply chain together.
+The individual captures are direct browser captures of the linked posts.
 
-## Full text transcript
+## Transcript
 
 ### Post 1 — 2026-07-09 7:39 PM
 
@@ -38,7 +37,7 @@ browser captures of the linked posts.
 
 > In my AGENTS.md
 
-The post attaches an image containing this instruction:
+The post includes this instruction:
 
 > # Log papercuts
 >
