@@ -17,11 +17,16 @@ jobs:
 
       - name: Install Lix
         uses: samueldr/lix-gha-installer-action@8dc19fbd6451fa106a68ecb2dafeeeb90dff3a29
+        with:
+          extra_nix_config: |
+            extra-substituters = https://crane.cachix.org
+            extra-trusted-public-keys = crane.cachix.org-1:8Scfpmn9w+hGdXH/Q9tTLiYAE/2dnJYRJP7kl80GuRk=
 
       - name: Configure Cachix
         uses: cachix/cachix-action@v17
         with:
-          name: nix-community
+          name: sakompella
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
 
       - name: Run Clippy
         run: nix develop --command cargo clippy --all-targets --all-features
