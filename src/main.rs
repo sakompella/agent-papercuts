@@ -16,7 +16,7 @@ const UNKNOWN_AUTHOR: &str = "unknown";
 
 fn main() -> Result<()> {
     color_eyre::install()?;
-    let command = Command::parse();
+    let command = CliOptions::parse();
     append_entry(&command)?;
     println!("Recorded papercut in {}.", command.file.display());
     Ok(())
@@ -29,7 +29,7 @@ fn main() -> Result<()> {
     long_about = None,
     after_help = concat!("Project: ", env!("CARGO_PKG_REPOSITORY"))
 )]
-struct Command {
+struct CliOptions {
     /// Model that encountered the friction.
     #[arg(short, long)]
     model: Option<String>,
@@ -47,7 +47,7 @@ struct Command {
     message: Vec<String>,
 }
 
-impl Command {
+impl CliOptions {
     fn message(&self) -> Result<String> {
         let message = normalize_message(&self.message.join(" "));
         if message.is_empty() {
@@ -58,10 +58,10 @@ impl Command {
     }
 }
 
-fn append_entry(command: &Command) -> Result<()> {
-    let author = command.author.as_deref().unwrap_or(UNKNOWN_AUTHOR);
-    let entry = format_entry(command, author, &Timestamp::now())?;
-    if let Some(parent) = command
+fn append_entry(options: &CliOptions) -> Result<()> {
+    let author = options.author.as_deref().unwrap_or(UNKNOWN_AUTHOR);
+    let entry = format_entry(options, author, &Timestamp::now())?;
+    if let Some(parent) = options
         .file
         .parent()
         .filter(|parent| !parent.as_os_str().is_empty())
@@ -73,11 +73,11 @@ fn append_entry(command: &Command) -> Result<()> {
     let mut log = OpenOptions::new()
         .create(true)
         .append(true)
-        .open(&command.file)
-        .wrap_err_with(|| format!("Could not open papercut log {}", command.file.display()))?;
+        .open(&options.file)
+        .wrap_err_with(|| format!("Could not open papercut log {}", options.file.display()))?;
     let initial_contents = if log
         .metadata()
-        .wrap_err_with(|| format!("Could not inspect papercut log {}", command.file.display()))?
+        .wrap_err_with(|| format!("Could not inspect papercut log {}", options.file.display()))?
         .len()
         == 0
     {
@@ -89,7 +89,7 @@ fn append_entry(command: &Command) -> Result<()> {
     log.write_all(payload.as_bytes()).wrap_err_with(|| {
         format!(
             "Could not append to papercut log {}",
-            command.file.display()
+            options.file.display()
         )
     })?;
     Ok(())
@@ -98,7 +98,7 @@ fn append_entry(command: &Command) -> Result<()> {
 /// Formats one normalized papercut as a Markdown level-two log entry.
 ///
 /// The model and author become single-line labels; the message must be non-empty.
-fn format_entry(command: &Command, author: &str, timestamp: &Timestamp) -> Result<String> {
+fn format_entry(command: &CliOptions, author: &str, timestamp: &Timestamp) -> Result<String> {
     let model = heading_label(
         command.model.as_deref().unwrap_or(UNSPECIFIED_MODEL),
         UNSPECIFIED_MODEL,
