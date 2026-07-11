@@ -2,8 +2,9 @@
 name = "agent-papercut"
 version = "0.1.0"
 edition = "2024"
-description = "A tiny CLI for recording agent workflow friction"
+description = "vibed agent tool for simple things"
 license = "MIT OR Apache-2.0"
+repository = "https://github.com/sakompella/agent-papercut"
 
 [dependencies]
 clap = { version = "4.6.1", features = ["derive"] }

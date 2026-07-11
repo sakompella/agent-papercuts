@@ -24,8 +24,10 @@ fn main() -> Result<()> {
 
 #[derive(Debug, Parser)]
 #[command(
-    name = "papercut",
-    about = "Record a small agent-workflow friction note in PAPERCUTS.md"
+    version,
+    about,
+    long_about = None,
+    after_help = concat!("Project: ", env!("CARGO_PKG_REPOSITORY"))
 )]
 struct Command {
     /// Model that encountered the friction.

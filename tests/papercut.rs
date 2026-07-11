@@ -77,6 +77,16 @@ fn appends_a_normalized_entry_to_the_requested_log() {
 }
 
 #[test]
+fn help_shows_project_information() {
+    let output = run_papercut(&["--help"]);
+
+    assert!(output.status.success());
+    let help = String::from_utf8_lossy(&output.stdout);
+    assert!(help.contains("vibed agent tool for simple things"));
+    assert!(help.contains("Project: https://github.com/sakompella/agent-papercut"));
+}
+
+#[test]
 fn rejects_a_missing_message() {
     let output = run_papercut(&["--model", "claude-sonnet-5"]);
 
