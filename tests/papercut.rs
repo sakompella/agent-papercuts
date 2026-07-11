@@ -35,9 +35,10 @@ impl Drop for TestLog {
     }
 }
 
-fn run_papercut(arguments: &[&str]) -> Output {
+fn run_papercut(arguments: &[&str], environment: &[(&str, &str)]) -> Output {
     let output = Command::new(env!("CARGO_BIN_EXE_papercut"))
         .args(arguments)
+        .envs(environment.iter().copied())
         .output();
     match output {
         Ok(output) => output,
@@ -49,14 +50,17 @@ fn run_papercut(arguments: &[&str]) -> Output {
 fn appends_a_normalized_entry_to_the_requested_log() {
     let log = TestLog::new();
     let log_path = log.path.to_string_lossy();
-    let output = run_papercut(&[
-        "--file",
-        &log_path,
-        "--model",
-        "gpt-5.6-terra",
-        "broken",
-        "  link",
-    ]);
+    let output = run_papercut(
+        &[
+            "--file",
+            &log_path,
+            "--model",
+            "gpt-5.6-terra",
+            "broken",
+            "  link",
+        ],
+        &[],
+    );
 
     assert!(output.status.success());
     let contents = match fs::read_to_string(&log.path) {
@@ -70,7 +74,7 @@ fn appends_a_normalized_entry_to_the_requested_log() {
 
 #[test]
 fn rejects_a_missing_message() {
-    let output = run_papercut(&["--model", "claude-sonnet-5"]);
+    let output = run_papercut(&["--model", "claude-sonnet-5"], &[]);
 
     assert!(!output.status.success());
     assert!(String::from_utf8_lossy(&output.stderr).contains("required"));
@@ -80,11 +84,45 @@ fn rejects_a_missing_message() {
 fn rejects_an_all_whitespace_message() {
     let log = TestLog::new();
     let log_path = log.path.to_string_lossy();
-    let output = run_papercut(&["--file", &log_path, "  \t\n "]);
+    let output = run_papercut(&["--file", &log_path, "  \t\n "], &[]);
 
     assert!(!output.status.success());
     assert!(String::from_utf8_lossy(&output.stderr).contains("papercut message cannot be empty"));
     assert!(!log.path.exists());
+}
+
+#[test]
+fn initializes_an_existing_empty_log() {
+    let log = TestLog::new();
+    if let Err(error) = fs::write(&log.path, "") {
+        panic!("empty log should be created: {error}");
+    }
+    let log_path = log.path.to_string_lossy();
+    let output = run_papercut(&["--file", &log_path, "A useful note."], &[]);
+
+    assert!(output.status.success());
+    let contents = match fs::read_to_string(&log.path) {
+        Ok(contents) => contents,
+        Err(error) => panic!("papercut log should be readable: {error}"),
+    };
+    assert!(contents.starts_with("# Papercuts\n\n"));
+}
+
+#[test]
+fn normalizes_model_and_author_labels() {
+    let log = TestLog::new();
+    let log_path = log.path.to_string_lossy();
+    let output = run_papercut(
+        &["--file", &log_path, "--model", "gpt\n5.6", "A useful note."],
+        &[("USER", "test\nauthor")],
+    );
+
+    assert!(output.status.success());
+    let contents = match fs::read_to_string(&log.path) {
+        Ok(contents) => contents,
+        Err(error) => panic!("papercut log should be readable: {error}"),
+    };
+    assert!(contents.contains(" — gpt 5.6 — test author\n\n"));
 }
 
 #[hegel::test]

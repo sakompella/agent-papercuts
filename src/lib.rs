@@ -5,6 +5,8 @@ use color_eyre::eyre::{Result, bail};
 
 mod helper;
 
+pub use helper::normalize_message;
+
 const DEFAULT_LOG_FILE: &str = "PAPERCUTS.md";
 
 #[derive(Debug, Parser)]
@@ -36,12 +38,6 @@ impl Command {
 
         Ok(message)
     }
-}
-
-/// Collapses every run of Unicode whitespace into one ASCII space.
-#[must_use]
-pub fn normalize_message(message: &str) -> String {
-    helper::normalize_message(message)
 }
 
 /// Runs the command-line interface.
