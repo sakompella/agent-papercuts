@@ -67,6 +67,7 @@ fn appends_a_normalized_entry_to_the_requested_log() {
     ]);
 
     assert!(output.status.success());
+    assert!(String::from_utf8_lossy(&output.stdout).contains("Recorded papercut"));
     let contents = match fs::read_to_string(&log.path) {
         Ok(contents) => contents,
         Err(error) => panic!("papercut log should be readable: {error}"),
@@ -83,6 +84,19 @@ fn appends_a_normalized_entry_to_the_requested_log() {
         panic!("written papercut log should have one entry");
     };
     assert_eq!(entry.message, "broken link");
+}
+
+#[test]
+fn recommends_the_project_log_at_the_git_root_without_a_file_flag() {
+    let output = run_papercut(&["A useful note."]);
+
+    assert!(output.status.success());
+    let recommendation = String::from_utf8_lossy(&output.stdout);
+    let project_log = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .join("docs")
+        .join("PAPERCUTS.md");
+    assert!(recommendation.contains("At the Git repository root"));
+    assert!(recommendation.contains(&*project_log.to_string_lossy()));
 }
 
 #[test]

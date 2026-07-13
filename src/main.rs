@@ -1,7 +1,9 @@
 use std::{
+    env,
     fs::{self, OpenOptions},
     io::Write,
-    path::PathBuf,
+    path::{Path, PathBuf},
+    process::Command,
 };
 
 use clap::Parser;
@@ -124,8 +126,16 @@ impl Papercut {
 fn main() -> Result<()> {
     color_eyre::install()?;
     let command = CliOptions::parse();
+    if let Some(recommended_file) = recommended_project_log(&command)? {
+        println!(
+            "At the Git repository root; record this papercut with --file {} instead.",
+            recommended_file.display()
+        );
+        return Ok(());
+    }
+
     append_entry(&command)?;
-    println!("Recorded papercut in {}.", command.file.display());
+    println!("Recorded papercut in {}.", command.log_file().display());
     Ok(())
 }
 
@@ -146,8 +156,8 @@ struct CliOptions {
     author: Option<String>,
 
     /// Markdown log to append to.
-    #[arg(long, default_value = DEFAULT_LOG_FILE)]
-    file: PathBuf,
+    #[arg(long)]
+    file: Option<PathBuf>,
 
     /// What happened and what would have prevented it.
     #[arg(required = true, num_args = 1..)]
@@ -155,6 +165,12 @@ struct CliOptions {
 }
 
 impl CliOptions {
+    fn log_file(&self) -> &Path {
+        self.file
+            .as_deref()
+            .unwrap_or_else(|| Path::new(DEFAULT_LOG_FILE))
+    }
+
     fn message(&self) -> Result<String> {
         let message = normalize_message(&self.message.join(" "));
         if message.is_empty() {
@@ -165,11 +181,36 @@ impl CliOptions {
     }
 }
 
+fn recommended_project_log(options: &CliOptions) -> Result<Option<PathBuf>> {
+    if options.file.is_some() {
+        return Ok(None);
+    }
+
+    let current_directory =
+        env::current_dir().wrap_err("Could not determine the current directory.")?;
+    let git_root = match Command::new("git")
+        .args(["rev-parse", "--show-toplevel"])
+        .output()
+    {
+        Ok(output) if output.status.success() => output,
+        Ok(_) | Err(_) => return Ok(None),
+    };
+    let git_root = String::from_utf8(git_root.stdout)
+        .wrap_err("Git returned a repository root that was not valid UTF-8.")?;
+    let git_root = PathBuf::from(git_root.trim_end_matches(['\r', '\n']));
+
+    if current_directory == git_root {
+        Ok(Some(git_root.join("docs").join(DEFAULT_LOG_FILE)))
+    } else {
+        Ok(None)
+    }
+}
+
 fn append_entry(options: &CliOptions) -> Result<()> {
     let author = options.author.as_deref().unwrap_or(UNKNOWN_AUTHOR);
     let entry = format_entry(options, author, &Timestamp::now())?;
-    if let Some(parent) = options
-        .file
+    let file = options.log_file();
+    if let Some(parent) = file
         // returns Some("") if relative path root
         .parent()
         .filter(|parent| !parent.as_os_str().is_empty())
@@ -182,12 +223,12 @@ fn append_entry(options: &CliOptions) -> Result<()> {
     let mut log = OpenOptions::new()
         .create(true)
         .append(true)
-        .open(&options.file)
-        .wrap_err_with(|| format!("Could not open papercut log {}", options.file.display()))?;
+        .open(file)
+        .wrap_err_with(|| format!("Could not open papercut log {}", file.display()))?;
 
     let initial_contents = if log
         .metadata()
-        .wrap_err_with(|| format!("Could not inspect papercut log {}", options.file.display()))?
+        .wrap_err_with(|| format!("Could not inspect papercut log {}", file.display()))?
         .len()
         == 0
     {
@@ -197,12 +238,8 @@ fn append_entry(options: &CliOptions) -> Result<()> {
     };
 
     let payload = format!("{initial_contents}{entry}");
-    log.write_all(payload.as_bytes()).wrap_err_with(|| {
-        format!(
-            "Could not append to papercut log {}",
-            options.file.display()
-        )
-    })?;
+    log.write_all(payload.as_bytes())
+        .wrap_err_with(|| format!("Could not append to papercut log {}", file.display()))?;
     Ok(())
 }
 

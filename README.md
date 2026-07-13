@@ -30,9 +30,12 @@ papercut --author codex -m claude-sonnet-5 --file docs/PAPERCUTS.md "The API ref
 
 The default author is `unknown`; use `--author` to record a person or agent.
 The default log is `PAPERCUTS.md` in the current directory. `--file` chooses a
-different log; its parent directories are created when needed. The message may
-contain multiple words and whitespace is normalized to one space. Model and
-author labels may not contain ` — `, which separates fields in each heading.
+different log; its parent directories are created when needed. When run from a
+Git repository root without `--file`, `papercut` stops and recommends
+`docs/PAPERCUTS.md` instead, so repository friction stays with its project. The
+message may contain multiple words and whitespace is normalized to one space.
+Model and author labels may not contain ` — `, which separates fields in each
+heading.
 
 Use `papercut --help` for the complete, generated interface.
 
