@@ -63,9 +63,11 @@ fn append_entry(options: &CliOptions) -> Result<()> {
     let entry = format_entry(options, author, &Timestamp::now())?;
     if let Some(parent) = options
         .file
+        // returns Some("") if relative path root
         .parent()
         .filter(|parent| !parent.as_os_str().is_empty())
     {
+        // ensure file exists
         fs::create_dir_all(parent)
             .wrap_err_with(|| format!("Could not create log directory {}", parent.display()))?;
     }
@@ -75,6 +77,7 @@ fn append_entry(options: &CliOptions) -> Result<()> {
         .append(true)
         .open(&options.file)
         .wrap_err_with(|| format!("Could not open papercut log {}", options.file.display()))?;
+
     let initial_contents = if log
         .metadata()
         .wrap_err_with(|| format!("Could not inspect papercut log {}", options.file.display()))?
@@ -85,6 +88,7 @@ fn append_entry(options: &CliOptions) -> Result<()> {
     } else {
         ""
     };
+
     let payload = format!("{initial_contents}{entry}");
     log.write_all(payload.as_bytes()).wrap_err_with(|| {
         format!(
