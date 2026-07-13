@@ -14,7 +14,7 @@ use hegel::generators;
 #[path = "../src/main.rs"]
 mod papercut;
 
-use papercut::normalize_message;
+use papercut::{Papercuts, normalize_message};
 
 static NEXT_TEST_ID: AtomicU64 = AtomicU64::new(0);
 
@@ -74,6 +74,15 @@ fn appends_a_normalized_entry_to_the_requested_log() {
     assert!(contents.starts_with("# Papercuts\n\n"));
     assert!(contents.contains(" — gpt-5.6-terra — unknown\n\n"));
     assert!(contents.ends_with("broken link\n"));
+
+    let parsed = match Papercuts::parse(&contents) {
+        Ok(papercuts) => papercuts,
+        Err(error) => panic!("written papercut log should parse: {error}"),
+    };
+    let [entry] = parsed.entries.as_slice() else {
+        panic!("written papercut log should have one entry");
+    };
+    assert_eq!(entry.message, "broken link");
 }
 
 #[test]
@@ -102,6 +111,23 @@ fn rejects_an_all_whitespace_message() {
 
     assert!(!output.status.success());
     assert!(String::from_utf8_lossy(&output.stderr).contains("papercut message cannot be empty"));
+    assert!(!log.path.exists());
+}
+
+#[test]
+fn rejects_a_label_that_contains_the_heading_separator() {
+    let log = TestLog::new();
+    let log_path = log.path.to_string_lossy();
+    let output = run_papercut(&[
+        "--file",
+        &log_path,
+        "--model",
+        "model — variant",
+        "A useful note.",
+    ]);
+
+    assert!(!output.status.success());
+    assert!(String::from_utf8_lossy(&output.stderr).contains("cannot contain ` — `"));
     assert!(!log.path.exists());
 }
 
@@ -142,6 +168,32 @@ fn normalizes_model_and_author_labels() {
         Err(error) => panic!("papercut log should be readable: {error}"),
     };
     assert!(contents.contains(" — gpt 5.6 — test author\n\n"));
+}
+
+#[test]
+fn parses_a_canonical_log_into_entries() {
+    let log = "# Papercuts\n\nSmall, non-blocking workflow friction recorded by agents.\n\n## 2026-07-10T06:54:19.910458Z — gpt-5.6-terra — aditya\n\nThe documentation omits the required environment variable.\n\n## 2026-07-11T06:54:19Z — unspecified-model — unknown\n\nThe command failed without explaining why.\n";
+
+    let papercuts = match Papercuts::parse(log) {
+        Ok(papercuts) => papercuts,
+        Err(error) => panic!("canonical papercut log should parse: {error}"),
+    };
+
+    let [first, second] = papercuts.entries.as_slice() else {
+        panic!("canonical log should contain two entries");
+    };
+    assert_eq!(first.model, "gpt-5.6-terra");
+    assert_eq!(first.author, "aditya");
+    assert_eq!(second.message, "The command failed without explaining why.");
+}
+
+#[test]
+fn rejects_a_malformed_papercut_entry() {
+    let invalid_timestamp = "# Papercuts\n\nSmall, non-blocking workflow friction recorded by agents.\n\n## not-a-timestamp — model — author\n\nA useful note.\n";
+    let unnormalized_author = "# Papercuts\n\nSmall, non-blocking workflow friction recorded by agents.\n\n## 2026-07-10T06:54:19Z — model — author  name\n\nA useful note.\n";
+
+    assert!(Papercuts::parse(invalid_timestamp).is_err());
+    assert!(Papercuts::parse(unnormalized_author).is_err());
 }
 
 #[hegel::test]
