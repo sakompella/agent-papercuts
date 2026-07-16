@@ -1,13 +1,10 @@
 # agent-papercuts
 
-A small Rust CLI for recording the pieces of friction agents encounter while
+A small CLI for recording "papercuts" the pieces of friction agents encounter while
 working: misleading errors, missing tools, broken links, and undocumented setup
 steps.
 
-It intentionally writes plain Markdown to `PAPERCUTS.md`, so the log can be
-reviewed and fixed like any other repository artifact. It is deliberately a
-write-only, local tool: it does not send data, call a model, or automatically
-mine sessions.
+It writes Markdown to `PAPERCUTS.md`, so the log can be reviewed and fixed  like any other repository artifact.
 
 ## Install
 
