@@ -30,3 +30,6 @@ jobs:
 
       - name: Run Clippy
         run: nix develop --command cargo clippy --all-targets --all-features
+
+      - name: Build papercut
+        run: nix build .#papercut
