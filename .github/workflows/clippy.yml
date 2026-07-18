@@ -9,8 +9,15 @@ permissions:
 
 jobs:
   clippy:
-    name: Clippy (aarch64-darwin)
-    runs-on: macos-latest
+    name: Clippy (${{ matrix.platform }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: macos-latest
+            platform: aarch64-darwin
+          - os: ubuntu-24.04-arm
+            platform: aarch64-linux
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
