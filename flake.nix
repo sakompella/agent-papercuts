@@ -25,7 +25,7 @@
           craneLib = crane.mkLib pkgs;
           commonArgs = {
             src = craneLib.cleanCargoSource ./.;
-            cargoExtraArgs = "--bin papercut";
+            cargoExtraArgs = "--package papercut --bin papercut";
             doCheck = false;
             strictDeps = true;
           };

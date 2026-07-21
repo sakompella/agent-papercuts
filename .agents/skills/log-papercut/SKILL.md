@@ -1,9 +1,9 @@
 ---
-name: log-papercuts
+name: log-papercut
 description: Record small, non-blocking workflow friction in this project's PAPERCUTS.md. Use when an agent encounters a dead-end command, misleading error, broken link, stale cache, or missing or confusing setup step while working.
 ---
 
-# Log Papercuts
+# Log Papercut
 
 Record actionable friction while it is fresh. Keep the log local and
 write-only; do not call a model or mine a session automatically.
@@ -15,10 +15,10 @@ write-only; do not call a model or mine a session automatically.
    tracker.
 2. Write one or two sentences: what you were doing, what got in the way, and,
    when known, what would have prevented it.
-3. Run the project CLI from the repository root:
+3. Run the globally installed CLI from the repository root:
 
    ```sh
-   cargo run -- --author <author> -m <model> "<what happened and what would have prevented it>"
+   papercut --author <author> -m <model> "<what happened and what would have prevented it>"
    ```
 
    Use the actual agent and model identifiers when available. Omit either flag

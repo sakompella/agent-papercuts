@@ -1,5 +1,5 @@
 [package]
-name = "agent-papercuts"
+name = "papercut"
 version = "0.1.0"
 edition = "2024"
 description = "vibed agent tool for logging simple issues"

@@ -18,16 +18,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "320119579fcad9c21884f5c4861d16174d0e06250625266f50fe6898340abefa"
 
 [[package]]
-name = "agent-papercuts"
-version = "0.1.0"
-dependencies = [
- "clap",
- "color-eyre",
- "hegeltest",
- "jiff",
-]
-
-[[package]]
 name = "anstream"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -521,6 +511,16 @@ name = "owo-colors"
 version = "4.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d211803b9b6b570f68772237e415a029d5a50c65d382910b879fb19d3271f94d"
+
+[[package]]
+name = "papercut"
+version = "0.1.0"
+dependencies = [
+ "clap",
+ "color-eyre",
+ "hegeltest",
+ "jiff",
+]
 
 [[package]]
 name = "parking_lot"
